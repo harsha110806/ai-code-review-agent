@@ -52,10 +52,10 @@ ai-code-review-agent/
 ---
 
 # How to Run
-
 ```bash
 cd src
 python main.py
+```
 
 # AI Code Review Feedback:
 - Function 'example' has many parameters. Consider using a data structure or keyword arguments.
