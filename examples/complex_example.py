@@ -1,21 +1,34 @@
-def process_orders(orders, tax_rate, discount, shipping_fee, service_charge, region):
+def generate_monthly_report(users, transactions, tax_rate, discount, region, include_summary):
+    report = {}
     total_revenue = 0
+    active_users = 0
 
-    for order in orders:
-        order_total = 0
+    for user in users:
+        user_total = 0
 
-        for item in order["items"]:
-            if item["quantity"] > 0:
-                item_price = item["price"] * item["quantity"]
-                order_total += item_price
+        if user["active"]:
+            active_users += 1
 
-                if region == "international":
-                    order_total += item_price * 0.1  # extra tax
+            for tx in transactions:
+                if tx["user_id"] == user["id"]:
+                    amount = tx["amount"]
 
-        if discount > 0:
-            order_total -= discount
+                    if region == "international":
+                        amount += amount * tax_rate
 
-        order_total += shipping_fee + service_charge
-        total_revenue += order_total
+                    if discount > 0:
+                        amount -= discount
 
-    return total_revenue
+                    user_total += amount
+
+        report[user["name"]] = user_total
+        total_revenue += user_total
+
+    if include_summary:
+        report["summary"] = {
+            "total_users": len(users),
+            "active_users": active_users,
+            "total_revenue": total_revenue
+        }
+
+    return report
