@@ -1,6 +1,7 @@
 from parser import CodeParser
 from context_compressor import ContextCompressor
 from ai_reviewer import AIReviewer
+from refiner import CodeRefiner
 
 
 def run_code_review(code: str):
@@ -14,21 +15,42 @@ def run_code_review(code: str):
     reviewer = AIReviewer(compressed_context)
     feedback = reviewer.review()
 
-    return feedback
+    refiner = CodeRefiner(code, feedback)
+    refined_code = refiner.refine()
+
+    return feedback, refined_code
 
 
 if __name__ == "__main__":
     sample_code = """
-def example(a, b, c, d, e):
-    for i in range(5):
-        for j in range(3):
-            if i % 2 == 0:
-                print(i, j)
-    return a + b + c + d + e
+def process_orders(orders, tax_rate, discount, shipping_fee, service_charge, region):
+    total_revenue = 0
+
+    for order in orders:
+        order_total = 0
+
+        for item in order["items"]:
+            if item["quantity"] > 0:
+                item_price = item["price"] * item["quantity"]
+                order_total += item_price
+
+                if region == "international":
+                    order_total += item_price * 0.1
+
+        if discount > 0:
+            order_total -= discount
+
+        order_total += shipping_fee + service_charge
+        total_revenue += order_total
+
+    return total_revenue
 """
 
-    results = run_code_review(sample_code)
+    feedback, refined = run_code_review(sample_code)
 
     print("AI Code Review Feedback:")
-    for item in results:
-        print("-", item)
+    for f in feedback:
+        print("-", f)
+
+    print("\nRefined Code Output:")
+    print(refined)
